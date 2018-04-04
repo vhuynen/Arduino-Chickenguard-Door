@@ -43,10 +43,10 @@ int automaticModeButton = 26; // pin Button automatic mode activation
 // LED Door Closed
 int pinLedDoorClosed = 22; // pin Blink Led when Door is close
 unsigned long previousMillis = 0; // will store last time LED was updated
-const long interval = 500; // Interval blink Led Door Closed
+const long interval = 10000; // Interval blink Led Door Closed
 boolean blinkLedDoorClosed = false;
 unsigned long blinkLedDoorClosedPeriod = 0; // Use to perform blink process
-long blinkLedDoorClosedDuration = 20000;// Time during Led blinks after closing process, adjust it if need it !
+long blinkLedDoorClosedDuration = 300000;// Time during Led blinks after closing process, adjust it if need it !
 // LED Error
 int pinErrorLed = 25; // pin Blink LED when Error have been thrown
 unsigned long previousMillisError = 0; // will store last time LED was updated
@@ -569,8 +569,8 @@ void sleepNow()         // here we put the arduino to sleep
 // Handle Opening Door Process
 void openDoor()
 {
-  long timeout = millis() + 15000;
-  long timeoutMicroSwitchBottom = millis() + 2000;
+  long timeout = millis() + 7000;
+  long timeoutMicroSwitchBottom = millis() + 1000;
   while ((millis() < timeout) && (digitalRead(pinMicroSwitchTop) == false))
   {
     if ((millis() > timeoutMicroSwitchBottom) && digitalRead(pinMicroSwitchBottom))
@@ -594,8 +594,8 @@ void openDoor()
 //Handle Closing Door Process
 void closeDoor()
 {
-  unsigned long timeout = millis() + 15000;
-  unsigned long timeoutMicroSwitchTop = millis() + 2000;
+  unsigned long timeout = millis() + 7000;
+  unsigned long timeoutMicroSwitchTop = millis() + 1000;
   while ((millis() < timeout) && (digitalRead(pinMicroSwitchBottom) == false))
   {
     if ((millis() > timeoutMicroSwitchTop) && digitalRead(pinMicroSwitchTop))
