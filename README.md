@@ -5,7 +5,9 @@ Reference materials :
 - Arduino Mega 2560
 - Motor MFA 918D Series
 - RTC DS3231
-- Battery 9V
+- Battery 12V
+- Solar Panel
+- Solar Panel Battery Regulator Charge Controller
 - Switch Button
 - Micro Switch
 - Potentiometer
@@ -14,7 +16,7 @@ Reference materials :
 - LCD
 - Resistor
 - L293D (Driver Motor)
-- Converter DC 5V
+- Converter DC/DC 12V/5V
 - Transistor NPN
 
 Program :
