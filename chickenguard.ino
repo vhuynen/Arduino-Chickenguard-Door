@@ -46,7 +46,7 @@ unsigned long previousMillis = 0; // will store last time LED was updated
 const long interval = 2000; // Interval blink Led Door Closed
 boolean blinkLedDoorClosed = false;
 unsigned long blinkLedDoorClosedPeriod = 0; // Use to perform blink process
-long blinkLedDoorClosedDuration = 120000;// Time during Led blinks after closing process, adjust it if need it !
+long blinkLedDoorClosedDuration = 600000;// Time during Led blinks after closing process, adjust it if needed !
 // LED Error
 int pinErrorLed = 25; // pin Blink LED when Error have been thrown
 unsigned long previousMillisError = 0; // will store last time LED was updated
@@ -54,7 +54,7 @@ const long intervalError = 300; // Interval blink Error LED
 // Photoresistor
 int photoResistor = A2; // pin Photo Resistor value
 int daylightThreshold = 700; // Adjust Threshold DayLight
-int nightLightThreshold = 500; // Adjust Threshold NightLight
+int nightLightThreshold = 50; // Adjust Threshold NightLight
 int nightMonths[12][2]; // Array of opening hour hh.mm
 int dayMonths[12][2]; // Array of closing hour hh.mm
 int pinMicroSwitchTop = 28; // pin Micro Switch Top
@@ -176,18 +176,18 @@ void setup() {
 
   dayMonths[6][1] = 6;
   dayMonths[6][2] = 0;
-  nightMonths[6][1] = 21;
-  nightMonths[6][2] = 50;
+  nightMonths[6][1] = 22;
+  nightMonths[6][2] = 45;
 
   dayMonths[7][1] = 6;
   dayMonths[7][2] = 0;
   nightMonths[7][1] = 22;
-  nightMonths[7][2] = 5;
+  nightMonths[7][2] = 45;
 
   dayMonths[8][1] = 6;
   dayMonths[8][2] = 0;
   nightMonths[8][1] = 22;
-  nightMonths[8][2] = 0;
+  nightMonths[8][2] = 30;
 
   dayMonths[9][1] = 6;
   dayMonths[9][2] = 30;
@@ -569,7 +569,7 @@ void sleepNow()         // here we put the arduino to sleep
 // Handle Opening Door Process
 void openDoor()
 {
-  long timeout = millis() + 8000;
+  long timeout = millis() + 5000;
   long timeoutMicroSwitchBottom = millis() + 1000;
   while ((millis() < timeout) && (digitalRead(pinMicroSwitchTop) == false))
   {
@@ -595,7 +595,7 @@ void openDoor()
 //Handle Closing Door Process
 void closeDoor()
 {
-  unsigned long timeout = millis() + 8000;
+  unsigned long timeout = millis() + 5000;
   unsigned long timeoutMicroSwitchTop = millis() + 1000;
   while ((millis() < timeout) && (digitalRead(pinMicroSwitchBottom) == false))
   {
