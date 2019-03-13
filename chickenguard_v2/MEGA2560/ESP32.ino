@@ -6,16 +6,15 @@ void sendDataToESP32(String status, long eventTimestamp, String error) {
   //Bootstrap ESP32
   digitalWrite(relay, HIGH);
 
-  json = serializedDataToESP32(status, (long)lastAlarmTime, eventTimestamp, getCelsiusTemperature(), error, sendSMS);
+  json = serializedDataToESP32(status, (long)lastAlarmTime, eventTimestamp, getCelsiusTemperature(), error, SMS);
 
-  delay(5000);
+  delay(15000);
   Serial.println("Send data...");
   Serial.println(json);
   sw.print(json + "$");
-  // Waiting sending Message
-  delay(15000);
+  // Waiting for process handling from ESP32
+  delay(20000);
   digitalWrite(relay, LOW);
-  Serial.println("Stop !");
 }
 
 // Serialized Data into json format as expected by the ESP32 module.
@@ -37,7 +36,3 @@ String serializedDataToESP32(String status, long lastAlarmTimestamp, long eventT
 
   return json;
 }
-
-
- 
-  

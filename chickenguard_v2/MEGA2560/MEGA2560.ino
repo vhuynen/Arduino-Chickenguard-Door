@@ -78,25 +78,25 @@ boolean powerSavingMode = true; // Allow to desactivate Power Saving Mode
 time_t lastAlarmTime; // Last triggering Alarm date
 //#################### End Power Saving ##############################/
 
-//#################### Start ESP 32 ############################/
+//#################### Start ESP32 for SMS notification ##############/
 SoftwareSerial sw(7, 8); // RX, TX
 int relay = 52;
-String sendSMS = "true";
-//##################### End ESP 32 #############################/
+String SMS = "true";
+boolean pushNotification = false;
+//##################### End ESP32 for MS notification  ###############/
 
 void setup() {
 
   // Uncomment this to Setup RTC time on first only, Be carrefuly you must set GMT Time
-  //setTimeRTC(18, 3, 21, 20, 56, 0);   
-  
-  // Comment 
+  //setTimeRTC(18, 3, 21, 20, 56, 0);
+
   Serial.begin(9600);
-  
+
   setSyncProvider(RTC.get);
   if (timeStatus() != timeSet)
     Serial.println("Unable to sync with the RTC");
   else
-    Serial.print("RTC has set the system time : ");printDateTime(now());
+    Serial.print("RTC has set the system time : "); printDateTime(now());
 
   // Setup Power Saving
   // initialize the alarms to known values, clear the alarm flags, clear the alarm interrupt flags
@@ -154,6 +154,12 @@ void setup() {
   //Setup LED Error
   pinMode(pinErrorLed, OUTPUT);
   digitalWrite(pinErrorLed, HIGH);
+
+  //Setup ESP32
+  pinMode(relay, OUTPUT);
+  digitalWrite(relay, LOW);
+  //Initialize TX speed
+  sw.begin(115200);
 
   //Setup Array of opening and closing time
   dayMonths[1][1] = 8;
@@ -315,15 +321,25 @@ void loop() {
         blinkLedDoorClosed = true;
         blinkLedDoorClosedPeriod = millis() + blinkLedDoorClosedDuration;
         lastClosing = t;
+        // If activated, sending notification through ESP32
+        if (pushNotification) {
+          sendDataToESP32("close", (long)myTZ.toLocal(now(), &tcr), "");
+        }
+      } else {
+        // Somethings wrong, sending error notification through ESP32
+        sendDataToESP32("error", (long)myTZ.toLocal(now(), &tcr), errorMsg);
       }
       Serial.print("Closing Door at : "); printDateTime(lastClosing);
     }
     //Open door
-    if
-    ((t >= openingDateTime && t < closingDateTime) && analogRead(photoResistor) > daylightThreshold && !error && !digitalRead(pinMicroSwitchTop)) {
+    if ((t >= openingDateTime && t < closingDateTime) && analogRead(photoResistor) > daylightThreshold && !error && !digitalRead(pinMicroSwitchTop)) {
       openDoor();
       if (error == false) {
         lastOpening = t;
+        // If activated, sending notification through ESP32
+        if (pushNotification) {
+          sendDataToESP32("open", (long)myTZ.toLocal(now(), &tcr), "");
+        }
         if (powerSavingMode) {
           // Switch Off backLight LCD
           switchOffLcd();
@@ -340,6 +356,9 @@ void loop() {
           // Call sleepNow function
           sleepNow();
         }
+      } else {
+        // Somethings wrong, sending error notification through ESP32
+        sendDataToESP32("error", (long)myTZ.toLocal(now(), &tcr), errorMsg);
       }
       return; // Return at the beginning of the loop
     }
@@ -660,13 +679,13 @@ void switchOffLcd() {
   lastActivateLcdMillis = 0;
 }
 
-// Handle turn on LCD 
+// Handle turn on LCD
 void turnOnLcd() {
-    digitalWrite(powerLCD, HIGH);
-    digitalWrite(contrastLCD, HIGH);
-    digitalWrite(backLight, HIGH);
-    LiquidCrystal LCD(rs, en, d4, d5, d6, d7); // We re-create screen LCD Object
-    lastActivateLcdMillis = millis();
+  digitalWrite(powerLCD, HIGH);
+  digitalWrite(contrastLCD, HIGH);
+  digitalWrite(backLight, HIGH);
+  LiquidCrystal LCD(rs, en, d4, d5, d6, d7); // We re-create screen LCD Object
+  lastActivateLcdMillis = millis();
 }
 
 // Retrieved temperature from RTC module
@@ -728,14 +747,14 @@ void printDateTime(time_t t)
 
 // Set RTC Time
 void setTimeRTC(int y, int m, int d, int h, int mm, int s) {
-    tmElements_t tm;
-    tm.Year = y2kYearToTm(y); // Format yy
-    tm.Month = m;
-    tm.Day = d;
-    tm.Hour = h;
-    tm.Minute = mm;
-    tm.Second = s;
-    t = makeTime(tm);
-    RTC.set(t);        //use the time_t value to ensure correct weekday is set
-    setTime(t);
+  tmElements_t tm;
+  tm.Year = y2kYearToTm(y); // Format yy
+  tm.Month = m;
+  tm.Day = d;
+  tm.Hour = h;
+  tm.Minute = mm;
+  tm.Second = s;
+  t = makeTime(tm);
+  RTC.set(t);        //use the time_t value to ensure correct weekday is set
+  setTime(t);
 }
