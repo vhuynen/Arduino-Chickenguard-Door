@@ -76,6 +76,7 @@ volatile boolean wakeUpManuallyWasCalled = false;
 volatile boolean wakeUpByAlarmWasCalled = false;
 boolean powerSavingMode = true; // Allow to desactivate Power Saving Mode
 time_t lastAlarmTime; // Last triggering Alarm date
+int pinLM2596DCtoDC = 38; // Handle On/Off LM2596 DC/DC Converter
 //#################### End Power Saving ##############################/
 
 //#################### Start ESP32 for SMS notification ##############/
@@ -161,6 +162,10 @@ void setup() {
   //Initialize TX speed
   sw.begin(115200);
 
+  //Setup LM2596 DC/DC Converter : VBatt 12v / Circuit 5v
+  pinMode(pinLM2596DCtoDC, OUTPUT);
+  digitalWrite(pinLM2596DCtoDC, LOW);
+
   //Setup Array of opening and closing time
   dayMonths[1][1] = 8;
   dayMonths[1][2] = 0;
@@ -228,6 +233,9 @@ void loop() {
   if (wakeUpByAlarmWasCalled)
   {
     delay(300);
+    // Switch On Power circuit
+    powerOn();
+    delay(1000);
     // Re-synchronize RTC with programm after wake up
     setSyncProvider(RTC.get);
     if (timeStatus() != timeSet)
@@ -265,6 +273,9 @@ void loop() {
   if (wakeUpManuallyWasCalled)
   {
     delay(300);
+    // Switch On Power circuit
+    powerOn();
+    delay(1000);
     // Re-synchronize RTC with programm after wake up
     setSyncProvider(RTC.get);
     if (timeStatus() != timeSet)
@@ -368,7 +379,7 @@ void loop() {
   if (digitalRead(scrollingButton) == LOW) {
     delay(300);  //Avoids button rebounce
     scrolling ++;
-    if (scrolling > 7) {
+    if (scrolling > 8) {
       LCD.clear();
       scrolling = 1;
     }
@@ -394,10 +405,23 @@ void loop() {
             LCD.print("MANUAL");
             Serial.println("MANUAL");
           }
-
           break;
         }
       case 3: {
+          LCD.clear();
+          LCD.print("NOTIFICATION :");
+          Serial.print("NOTIFICATION : ");
+          LCD.setCursor(0, 1);
+          if (pushNotification) {
+            LCD.print("ACTIVATED");
+            Serial.println("ACTIVATED");
+          } else {
+            LCD.print("NONE");
+            Serial.println("NONE");
+          }
+          break;
+        }
+      case 4: {
           LCD.clear();
           LCD.print("LAST OPENING :");
           if (lastOpening > 100) {
@@ -407,7 +431,7 @@ void loop() {
           }
           break;
         }
-      case 4: {
+      case 5: {
           LCD.clear();
           LCD.print("LAST CLOSING :");
           if (lastClosing > 100) {
@@ -417,7 +441,7 @@ void loop() {
           }
           break;
         }
-      case 5: {
+      case 6: {
           LCD.clear();
           LCD.print("LAST ALARM :");
           if (lastAlarmTime > 100) {
@@ -427,7 +451,7 @@ void loop() {
           }
           break;
         }
-      case 6: {
+      case 7: {
           LCD.clear();
           LCD.print("ERROR CODE :");
 
@@ -439,7 +463,7 @@ void loop() {
           }
           break;
         }
-      case 7: {
+      case 8: {
           LCD.clear();
           LCD.print("PHOTORESISTOR :");
           Serial.print("PHOTORESISTOR :");
@@ -497,6 +521,7 @@ void loop() {
   if (digitalRead(openDoorButton) == LOW) {
     delay(300); //Avoids button rebounce
     modeAuto = false;
+    pushNotification = false;
 
     // Activate LCD
     turnOnLcd();
@@ -517,7 +542,8 @@ void loop() {
   if (digitalRead(closeDoorButton) == LOW) {
     delay(300);  //Avoids button rebounce
     modeAuto = false;
-
+    pushNotification = false;
+    
     // Activate LCD
     turnOnLcd();
     LCD.begin(16, 2);
@@ -533,18 +559,31 @@ void loop() {
     switchOffLcd();
   }
 
-  //Switch on Automatic Mode
+  //Handle Automatic Mode and Notification
   if (digitalRead(automaticModeButton) == LOW) {
     delay(300);  //Avoids button rebounce
-    modeAuto = true;
-
-    // Activate LCD
-    turnOnLcd();
-    LCD.begin(16, 2);
-    LCD.clear(); // Clear screen
-    LCD.print("AUTOMATIC MODE");
-    LCD.setCursor(0, 1);
-    LCD.print("ACTIVATE");
+     // Notifications can be activate only on automatic mode    
+     if (modeAuto == true) {
+      pushNotification = true;
+      // Activate LCD
+      turnOnLcd();
+      LCD.begin(16, 2);
+      LCD.clear(); // Clear screen
+      LCD.print("NOTIFICATION");
+      LCD.setCursor(0, 1);
+      LCD.print("ACTIVATED");
+    }
+    // First, activating automatic mode   
+    if (modeAuto == false) {
+      modeAuto = true;
+      // Activate LCD
+      turnOnLcd();
+      LCD.begin(16, 2);
+      LCD.clear(); // Clear screen
+      LCD.print("AUTOMATIC MODE");
+      LCD.setCursor(0, 1);
+      LCD.print("ACTIVATED");
+    }
   }
 
   // Handle Error LED
@@ -580,6 +619,9 @@ void wakeUpByAlarm()
 
 void sleepNow()         // here we put the arduino to sleep
 {
+  // Switch Off Power circuit before deep sleeping
+  powerOff();
+  delay(300);
   // See https://playground.arduino.cc/Learning/ArduinoSleepCode for more
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here, SLEEP_MODE_PWR_DOWN is the most power savings
   sleep_enable();
@@ -694,6 +736,16 @@ String getCelsiusTemperature() {
   int t = RTC.temperature();
   float celsius = t / 4.0;
   return String(celsius, 1);
+}
+
+// Turn On power circuit
+void powerOn() {
+  digitalWrite(pinLM2596DCtoDC, LOW);
+}
+
+// Switch Off power circuit
+void powerOff() {
+  digitalWrite(pinLM2596DCtoDC, HIGH);
 }
 
 void printDateTimeLcd(time_t t, int nbrRow) {
