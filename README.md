@@ -10,7 +10,6 @@ Reference materials :
 - Solar Panel Battery Regulator Charge Controller
 - Switch Button
 - Micro Switch
-- Potentiometer
 - LED
 - Photoresistor
 - LCD
