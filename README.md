@@ -1,4 +1,4 @@
-# chickenguard
+# Chickenguard
 Arduino Chickenguard Project
 
 Reference materials :
@@ -6,13 +6,13 @@ Reference materials :
 - Motor MFA 918D Series
 - RTC DS3231
 - Battery 12V
-- Solar Panel
+- Solar Panel 
 - Solar Panel Battery Regulator Charge Controller
 - Switch Button
 - Micro Switch
 - LED
 - Photoresistor
-- LCD
+- LCD 16x2
 - Resistor
 - L293D (Driver Motor)
 - Converter DC/DC 12V/5V
@@ -25,7 +25,7 @@ Program :
   - Wake Up function
   - Error Handler
 
-# Circuit Board 
+## Circuit Board 
 <p align="center">
   <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%">
 </p>
