@@ -25,5 +25,5 @@ Program :
   - Wake Up function
   - Error Handler
   
-  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%" hight="50%" align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%" hight="50%"  class="center">
 
