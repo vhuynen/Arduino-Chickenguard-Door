@@ -25,7 +25,27 @@ Program :
   - Wake Up function
   - Error Handler
 
-## Circuit Board 
+# Circuit Board 
 <p align="center">
   <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%">
+</p>
+
+## Prototype
+<p align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Prototype.jpg" width="50%">
+</p>
+
+## Photoresistor
+<p align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Photoresistor.jpg" width="50%">
+</p>
+
+## Dashboard
+<p align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Dashboard.jpg" width="50%">
+</p>
+
+## Cover 
+<p align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Cover.jpg" width="50%">
 </p>
