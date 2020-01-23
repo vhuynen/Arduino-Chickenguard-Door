@@ -24,7 +24,8 @@ Program :
   - Mode Manual / Automatic
   - Wake Up function
   - Error Handler
-  <p align="center">
-  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%">
 
+## Circuit Board 
+<p align="center">
+  <img src="https://github.com/vhuynen/chickenguard/blob/master/Pictures/Circuit%20board.jpg" width="50%">
 </p>
